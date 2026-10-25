@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch IP Lookup</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #0f1419; color: #e6e6e6;
+               max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h1 { font-weight: 600; }
+        a.nav { color: #60a5fa; }
+        textarea { width: 100%; height: 140px; padding: 12px; border-radius: 8px;
+               border: 1px solid #2a2f36; background: #1a1f26; color: #e6e6e6;
+               font-size: 15px; font-family: monospace; }
+        button { padding: 10px 20px; border: none; border-radius: 8px;
+               background: #2563eb; color: white; font-size: 15px; cursor: pointer; margin: 10px 8px 0 0; }
+        button.csv { background: #15803d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 14px; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid #2a2f36; text-align: left; }
+        th { color: #9ca3af; }
+        .bad { color: #f87171; }
+    </style>
+</head>
+<body>
+    <h1>Batch IP Lookup</h1>
+    <p><a class="nav" href="/">← Single lookup</a></p>
+
+    <form method="POST">
+        <textarea name="ips" placeholder="Paste IPs, one per line (max 40)&#10;8.8.8.8&#10;1.1.1.1"></textarea>
+        <br>
+        <button type="submit" name="action" value="view">Look up</button>
+        <button type="submit" name="action" value="csv" class="csv">Download CSV</button>
+    </form>
+
+    {% if rows %}
+        <table>
+            <tr>
+                <th>IP</th><th>Country</th><th>City</th><th>ISP</th>
+                <th>ASN</th><th>Proxy</th><th>Hosting</th><th>Abuse</th>
+            </tr>
+            {% for r in rows %}
+                <tr>
+                    <td>{{ r.query }}</td>
+                    {% if r.error %}
+                        <td colspan="7" class="bad">{{ r.error }}</td>
+                    {% else %}
+                        <td>{{ r.country }}</td>
+                        <td>{{ r.city }}</td>
+                        <td>{{ r.isp }}</td>
+                        <td>{{ r.as }}</td>
+                        <td>{% if r.proxy %}⚠️{% else %}–{% endif %}</td>
+                        <td>{% if r.hosting %}⚠️{% else %}–{% endif %}</td>
+                        <td>{{ r.abuse_score }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html>

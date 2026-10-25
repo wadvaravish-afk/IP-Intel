@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Intelligence Lookup</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #0f1419; color: #e6e6e6;
+               max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { font-weight: 600; }
+        form { display: flex; gap: 10px; margin: 20px 0; }
+        input[type=text] { flex: 1; padding: 12px; border-radius: 8px;
+               border: 1px solid #2a2f36; background: #1a1f26; color: #e6e6e6; font-size: 16px; }
+        button { padding: 12px 24px; border: none; border-radius: 8px;
+               background: #2563eb; color: white; font-size: 16px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .error { color: #f87171; margin: 15px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #2a2f36; }
+        td.label { color: #9ca3af; width: 160px; }
+        a { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <h1>IP Intelligence Lookup</h1>
+
+    <form method="POST">
+        <input type="text" name="ip" placeholder="Enter an IP address (e.g. 8.8.8.8)" autofocus>
+        <button type="submit">Look up</button>
+    </form>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if result %}
+        <h2>Results for {{ result.query }}</h2>
+        <table>
+            <tr><td class="label">Country</td><td>{{ result.country }}</td></tr>
+            <tr><td class="label">Region</td><td>{{ result.regionName }}</td></tr>
+            <tr><td class="label">City</td><td>{{ result.city }}</td></tr>
+            <tr><td class="label">Coordinates</td>
+                <td><a href="https://www.google.com/maps?q={{ result.lat }},{{ result.lon }}"
+                       target="_blank">{{ result.lat }}, {{ result.lon }}</a></td></tr>
+            <tr><td class="label">ISP</td><td>{{ result.isp }}</td></tr>
+            <tr><td class="label">Organisation</td><td>{{ result.org }}</td></tr>
+            <tr><td class="label">ASN</td><td>{{ result.as }}</td></tr>
+            <tr><td class="label">Zip</td><td>{{ result.zip }}</td></tr>
+            <tr><td class="label">Timezone</td><td>{{ result.timezone }}</td></tr>
+            <tr><td class="label">Proxy / VPN</td>
+                <td>{% if result.proxy %}⚠️ Yes{% else %}No{% endif %}</td></tr>
+            <tr><td class="label">Hosting / Datacentre</td>
+                <td>{% if result.hosting %}⚠️ Yes{% else %}No{% endif %}</td></tr>
+            <tr><td class="label">Mobile Network</td>
+                <td>{% if result.mobile %}Yes{% else %}No{% endif %}</td></tr>
+            {% if result.reputation %}
+            <tr><td class="label">Abuse Score</td>
+                <td>{{ result.reputation.score }}/100
+                {% if result.reputation.score >= 50 %}🔴 High risk
+                {% elif result.reputation.score > 0 %}🟡 Some reports
+                {% else %}🟢 Clean{% endif %}</td></tr>
+            <tr><td class="label">Total Reports</td>
+                <td>{{ result.reputation.reports }}</td></tr>
+            {% endif %}
+        </table>
+    {% endif %}
+</body>
